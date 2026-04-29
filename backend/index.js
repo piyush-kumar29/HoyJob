@@ -34,6 +34,7 @@ const corsOptions = {
                       process.env.NODE_ENV !== 'production' ||
                       !process.env.FRONTEND_URL ||
                       origin.includes('onrender.com') ||
+                      origin.includes('vercel.app') ||
                       origin.includes('localhost') ||
                       origin.includes('127.0.0.1');
     

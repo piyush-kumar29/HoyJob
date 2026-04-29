@@ -32,13 +32,18 @@ const corsOptions = {
     
     const isAllowed = allowedOrigins.includes(origin) || 
                       process.env.NODE_ENV !== 'production' ||
-                      !process.env.FRONTEND_URL; // If FRONTEND_URL is not set, allow all in production for easier debug
+                      !process.env.FRONTEND_URL ||
+                      origin.includes('onrender.com') ||
+                      origin.includes('localhost') ||
+                      origin.includes('127.0.0.1');
     
     if (isAllowed) {
       callback(null, true);
     } else {
       console.warn(`CORS blocked for origin: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
+      // Instead of throwing an error which triggers a 500 without headers, 
+      // we can just return false which the cors middleware handles better
+      callback(null, false); 
     }
   },
   credentials: true,
@@ -144,6 +149,24 @@ io.on('connection', (socket) => {
         break;
       }
     }
+  });
+});
+
+// Global Error Handler (Keep this before server.listen)
+app.use((err, req, res, next) => {
+  console.error('SERVER ERROR:', err);
+  
+  // Ensure CORS headers are sent even on errors so the frontend can read the message
+  const origin = req.headers.origin;
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+  }
+
+  res.status(err.status || 500).json({
+    error: 'Internal Server Error',
+    message: err.message,
+    details: process.env.NODE_ENV === 'development' ? err.stack : undefined
   });
 });
 

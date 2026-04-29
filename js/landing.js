@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     newsletterBtn.addEventListener('click', () => {
       const emailInput = document.getElementById('email');
       const subscribeCheckbox = document.getElementById('subscribe');
-      
+
       if (!emailInput.value) {
         alert('Please enter your email.');
         return;

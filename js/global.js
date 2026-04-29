@@ -45,7 +45,7 @@ function requireAuth() {
 async function apiFetch(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint}`;
   const token = getToken();
-  
+
   const headers = {
     'Content-Type': 'application/json',
     ...(token && { 'Authorization': `Bearer ${token}` }),
@@ -54,7 +54,7 @@ async function apiFetch(endpoint, options = {}) {
 
   try {
     const response = await fetch(url, { ...options, headers });
-    
+
     // Check if response is JSON
     const contentType = response.headers.get('content-type');
     let data;
@@ -65,7 +65,8 @@ async function apiFetch(endpoint, options = {}) {
     }
 
     if (!response.ok) {
-      throw new Error(data.msg || data.error || `HTTP Error ${response.status}`);
+      const errorMsg = data.message || data.error || data.msg || `HTTP Error ${response.status}`;
+      throw new Error(errorMsg);
     }
 
     return data;
@@ -114,8 +115,8 @@ function buildNav() {
       </div>`;
   } else {
     const dashboardLink = user.role === 'recruiter' ? 'recruiter-dashboard.html' : 'agent-dashboard.html';
-    const initials = user.name ? user.name.split(' ').map(n=>n[0]).join('') : 'U';
-    
+    const initials = user.name ? user.name.split(' ').map(n => n[0]).join('') : 'U';
+
     nav.innerHTML = `
       <a href="${base}pages/${dashboardLink}" class="logo">
         <div class="logo-oval">

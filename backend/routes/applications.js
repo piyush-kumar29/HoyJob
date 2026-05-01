@@ -75,7 +75,7 @@ router.get('/my', auth, async (req, res) => {
       .populate('job', 'title company')
       .populate('agent', 'name email experience skills')
       .populate('recruiter', 'name email organization')
-      .sort({ createdAt: -1 });
+      .sort({ updatedAt: -1 });
     res.json(apps);
   } catch (err) {
     console.error('Fetch My Apps Error:', err.message);

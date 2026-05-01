@@ -5,7 +5,6 @@ const ApplicationSchema = new mongoose.Schema({
   agent: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   recruiter: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   status: { type: String, enum: ['pending', 'accepted', 'rejected', 'interview'], default: 'pending' },
-  createdAt: { type: Date, default: Date.now }
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Application', ApplicationSchema);

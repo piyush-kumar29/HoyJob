@@ -55,7 +55,19 @@ async function loadAgentDashboard() {
     const jobs = await apiFetch('/jobs');
     if (recEl) {
       recEl.innerHTML = '';
-      jobs.slice(0, 4).forEach((job) => {
+      
+      // Skill-based filtering
+      const userSkills = (user.skills || []).map(s => s.toLowerCase());
+      const recommendedJobs = jobs
+        .map(job => {
+          const jobSkills = (job.skills || '').split(',').map(s => s.trim().toLowerCase()).filter(s => s);
+          const matchCount = jobSkills.filter(s => userSkills.includes(s)).length;
+          return { ...job, matchCount };
+        })
+        .sort((a, b) => b.matchCount - a.matchCount)
+        .slice(0, 4);
+
+      recommendedJobs.forEach((job) => {
         recEl.innerHTML += `
           <div class="stat-card" style="display:flex; align-items:center; gap:1rem; padding:1rem;">
             <div style="background:#000; color:#EFFF00; width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0;">${job.title[0]}</div>
@@ -67,11 +79,7 @@ async function loadAgentDashboard() {
       });
     }
 
-    const apps = await apiFetch('/applications/recruiter'); // Assuming we reuse or a specific route
-    // Wait, the recruiter route only shows recruiter apps.
-    // I need an agent specific route or just filter.
-    // Let's create an agent route or just use a general GET /applications.
-    // Let's assume the recruiter route is actually /applications which returns all for the user depending on role.
+    // Load Applications
     
     if (tbody) {
       try {
@@ -81,12 +89,37 @@ async function loadAgentDashboard() {
         } else {
           tbody.innerHTML = '';
           myApps.forEach(app => {
+            let statusClass = 'badge-pending';
+            let displayStatus = app.status;
+
+            if (app.status === 'accepted') {
+              statusClass = 'badge-approved';
+              displayStatus = 'approved';
+            } else if (app.status === 'interview') {
+              statusClass = 'badge-interview';
+              displayStatus = 'interview';
+            } else if (app.status === 'rejected') {
+              statusClass = 'badge-rejected';
+              displayStatus = 'rejected';
+            }
+
+            const jobTitle = app.job ? app.job.title : 'Deleted Position';
+            const companyName = app.job ? app.job.company : 'N/A';
+            
+            let chatBtn = '';
+            if (app.status === 'accepted' || app.status === 'interview') {
+              chatBtn = `<a href="chat.html?userId=${app.recruiter._id || app.recruiter}" class="btn btn-ghost btn-sm" style="margin-left:1rem; padding:2px 8px; font-size:0.65rem;">Chat</a>`;
+            }
+
             tbody.innerHTML += `
               <tr>
-                <td><strong>${app.job.title}</strong></td>
-                <td>${app.job.company}</td>
-                <td><span class="badge-pill ${app.status === 'accepted' ? 'badge-hot' : 'badge-new'}">${app.status.toUpperCase()}</span></td>
-                <td>${new Date(app.createdAt).toLocaleDateString()}</td>
+                <td><strong>${jobTitle}</strong></td>
+                <td>${companyName}</td>
+                <td>
+                  <span class="badge-pill ${statusClass}">${displayStatus.toUpperCase()}</span>
+                  ${chatBtn}
+                </td>
+                <td>${new Date(app.updatedAt || app.createdAt).toLocaleDateString()}</td>
               </tr>`;
           });
         }
@@ -225,7 +258,7 @@ window.updateAppStatus = async (appId, status) => {
       method: 'PUT',
       body: JSON.stringify({ status })
     });
-    alert(`Application ${status === 'accepted' ? 'accepted for interview' : 'passed'}`);
+    alert(`Application ${status === 'accepted' ? 'approved and moved to Interview' : 'rejected'}`);
     location.reload();
   } catch (err) {
     alert(err.message);

@@ -143,7 +143,13 @@
   border-radius: var(--radius-pill);
   font-size: 0.65rem;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
+.badge-pending { background: rgba(0, 0, 0, 0.05); color: var(--gray); border: 1px solid rgba(0,0,0,0.05); }
+.badge-approved { background: rgba(34, 197, 94, 0.1); color: #16a34a; border: 1px solid rgba(34, 197, 94, 0.2); }
+.badge-rejected { background: rgba(239, 68, 68, 0.1); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.2); }
+.badge-interview { background: rgba(239, 255, 0, 0.2); color: #000; border: 1px solid rgba(239, 255, 0, 0.4); }
 .badge-hot { background: rgba(239, 255, 0, 0.15); color: #000; }
 .badge-new { background: rgba(0, 0, 0, 0.05); color: var(--gray); }
 

@@ -41,25 +41,59 @@ router.post('/signup', async (req, res) => {
     const message = `Welcome to HoyJob! Please verify your email by clicking the link below:\n\n${verificationURL}\n\nThis link will expire in 24 hours.`;
     
     const html = `
-      <div style="max-width: 600px; margin: 0 auto; font-family: 'Inter', sans-serif; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
-        <div style="background-color: #000000; padding: 40px; text-align: center;">
-          <h1 style="color: #EFFF00; margin: 0; font-size: 32px; font-weight: 900; letter-spacing: -1px;">HoyJob</h1>
-        </div>
-        <div style="padding: 40px;">
-          <h2 style="color: #1a202c; font-size: 24px; font-weight: 700; margin-bottom: 24px;">Verify your email address</h2>
-          <p style="color: #4a5568; font-size: 16px; line-height: 24px; margin-bottom: 32px;">
-            Thanks for joining HoyJob! To get started, please confirm your email address by clicking the button below.
-          </p>
-          <div style="text-align: center; margin-bottom: 32px;">
-            <a href="${verificationURL}" style="background-color: #000000; color: #EFFF00; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: 700; display: inline-block;">Verify Email Address</a>
-          </div>
-          <p style="color: #718096; font-size: 14px; margin-bottom: 0;">
-            If the button doesn't work, copy and paste this link into your browser:
-            <br>
-            <span style="color: #3182ce;">${verificationURL}</span>
-          </p>
-        </div>
-      </div>
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #f7f7f7; font-family: 'Inter', -apple-system, sans-serif;">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f7f7f7; padding: 40px 20px;">
+          <tr>
+            <td align="center">
+              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                <!-- Header -->
+                <tr>
+                  <td style="background-color: #000000; padding: 50px 40px; text-align: center;">
+                    <h1 style="color: #EFFF00; margin: 0; font-family: 'Epilogue', sans-serif; font-size: 38px; font-weight: 900; letter-spacing: -1.5px; text-transform: uppercase;">HoyJob</h1>
+                  </td>
+                </tr>
+                <!-- Content -->
+                <tr>
+                  <td style="padding: 50px 40px;">
+                    <h2 style="color: #111827; font-size: 28px; font-weight: 800; margin: 0 0 16px 0; letter-spacing: -0.5px;">Verify your account</h2>
+                    <p style="color: #4b5563; font-size: 17px; line-height: 28px; margin: 0 0 32px 0;">
+                      Welcome to the future of hiring. To activate your account and start exploring premium opportunities, please verify your email address.
+                    </p>
+                    <div style="text-align: center;">
+                      <a href="${verificationURL}" style="background-color: #000000; color: #EFFF00; padding: 20px 40px; border-radius: 12px; text-decoration: none; font-weight: 800; font-size: 16px; display: inline-block; transition: transform 0.2s;">VERIFY ADDRESS</a>
+                    </div>
+                  </td>
+                </tr>
+                <!-- Divider -->
+                <tr>
+                  <td style="padding: 0 40px;">
+                    <div style="border-top: 1px solid #e5e7eb;"></div>
+                  </td>
+                </tr>
+                <!-- Footer Info -->
+                <tr>
+                  <td style="padding: 32px 40px; background-color: #fafafa;">
+                    <p style="color: #9ca3af; font-size: 13px; line-height: 20px; margin: 0;">
+                      If you didn't create an account, you can safely ignore this email.
+                      <br><br>
+                      <strong>Link not working?</strong> Copy this into your browser:
+                      <br>
+                      <span style="color: #6366f1; word-break: break-all;">${verificationURL}</span>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+              <p style="color: #9ca3af; font-size: 12px; margin-top: 24px;">© 2026 HoyJob Inc. All Rights Reserved.</p>
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
     `;
 
     try {

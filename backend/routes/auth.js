@@ -19,9 +19,9 @@ router.post('/signup', async (req, res) => {
       name, 
       email, 
       password, 
-      role, 
+      role,
       verificationToken,
-      isVerified: false 
+      isVerified: false
     });
     
     await user.save();
@@ -82,10 +82,13 @@ router.get('/verify/:token', async (req, res) => {
     await user.save();
 
     res.send(`
-      <div style="font-family: sans-serif; text-align: center; padding: 4rem;">
-        <h1 style="color: #22c55e;">Verification Successful! ✓</h1>
-        <p>Your HoyJob account is now active. You can close this window and log in.</p>
-        <a href="/" style="color: #000; font-weight: bold;">Go to Login</a>
+      <div style="font-family: 'Sora', sans-serif; text-align: center; padding: 5rem 2rem; background-color: #f9f9f9; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 3rem; border-radius: 24px; border: 2px solid #000; box-shadow: 10px 10px 0px #000; max-width: 400px;">
+          <div style="font-size: 4rem; margin-bottom: 1rem;">✅</div>
+          <h1 style="margin: 0 0 1rem 0; font-size: 2rem;">Verified!</h1>
+          <p style="color: #666; line-height: 1.6; margin-bottom: 2rem;">Your account is now active. You can close this window and log in to your dashboard.</p>
+          <a href="/pages/login.html" style="display: inline-block; background: #EFFF00; color: #000; padding: 1rem 2rem; border-radius: 12px; border: 2px solid #000; font-weight: bold; text-decoration: none; text-transform: uppercase; letter-spacing: 1px; box-shadow: 4px 4px 0px #000;">Go to Login</a>
+        </div>
       </div>
     `);
   } catch (err) {

@@ -47,16 +47,36 @@ async function handleSignup(e) {
       body: JSON.stringify({ name, email, password, role })
     });
 
-    setToken(data.token);
-    setUser(data.user);
+    if (data.msg) {
+      showSuccess(data.msg);
+      // Hide error if visible
+      const errorEl = document.getElementById('auth-error');
+      if (errorEl) errorEl.style.display = 'none';
+      return;
+    }
 
-    if (data.user.role === 'agent') {
-      window.location.href = 'agent-dashboard.html';
-    } else {
-      window.location.href = 'recruiter-dashboard.html';
+    // Fallback if token is returned (e.g. if verification is disabled)
+    if (data.token) {
+      setToken(data.token);
+      setUser(data.user);
+      if (data.user.role === 'agent') {
+        window.location.href = 'agent-dashboard.html';
+      } else {
+        window.location.href = 'recruiter-dashboard.html';
+      }
     }
   } catch (err) {
     showError(err.message);
+  }
+}
+
+function showSuccess(msg) {
+  const el = document.getElementById('auth-success');
+  if (el) { 
+    el.textContent = msg; 
+    el.style.display = 'block'; 
+  } else {
+    alert(msg); // Fallback
   }
 }
 

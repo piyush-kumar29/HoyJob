@@ -9,8 +9,10 @@ const auth = require('../middleware/auth');
 
 // @route   POST api/auth/signup
 // @desc    Register user & send verification email
-router.post('/signup', async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const name = req.body.name.trim();
+  const email = req.body.email.trim().toLowerCase();
+  const password = req.body.password.trim();
+  const role = req.body.role;
 
   try {
     let user = await User.findOne({ email });
@@ -116,16 +118,20 @@ router.get('/verify/:token', async (req, res) => {
 // @route   POST api/auth/login
 // @desc    Authenticate user & get token
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+    const email = req.body.email.trim().toLowerCase();
+    const password = req.body.password.trim();
 
-  try {
+    console.log(`Login attempt for: ${email}`);
+
     let user = await User.findOne({ email });
     if (!user) {
+      console.log(`Login failed: User not found for ${email}`);
       return res.status(400).json({ msg: 'Invalid Credentials' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      console.log(`Login failed: Password mismatch for ${email}`);
       return res.status(400).json({ msg: 'Invalid Credentials' });
     }
 

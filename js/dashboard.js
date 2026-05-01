@@ -84,6 +84,22 @@ async function loadAgentDashboard() {
     if (tbody) {
       try {
         const myApps = await apiFetch('/applications/my'); 
+        
+        // Calculate Apps This Week
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const recentApps = myApps.filter(app => new Date(app.createdAt) >= sevenDaysAgo);
+        const trendEl = document.getElementById('stat-apps-trend');
+        if (trendEl) trendEl.textContent = `+${recentApps.length} this week`;
+
+        const upcomingInterviews = myApps.filter(app => app.status === 'accepted' || app.status === 'interview');
+        const interviewsNextEl = document.getElementById('stat-interviews-next');
+        if (interviewsNextEl) {
+          interviewsNextEl.textContent = upcomingInterviews.length > 0 
+            ? `${upcomingInterviews.length} upcoming sessions` 
+            : 'No upcoming';
+        }
+
         if (myApps.length === 0) {
           tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:2rem; color:#999;">No active applications</td></tr>';
         } else {
@@ -196,7 +212,7 @@ async function loadRecruiterDashboard() {
         const agentName = agent.name && agent.name.toLowerCase() !== 'google' ? agent.name : agent.email.split('@')[0];
         candEl.innerHTML += `
           <div class="stat-card" style="display:flex; align-items:center; gap:1.25rem; padding:1.25rem;">
-            <div style="width:40px; height:40px; border-radius:50%; background:#f0f0f0; display:flex; align-items:center; justify-content:center; font-weight:700; border:1px solid #ddd;">${agentName[0]}</div>
+            <div onclick="openProfileModal('${agent._id || agent.id}', event)" style="cursor:pointer; width:40px; height:40px; border-radius:50%; background:#f0f0f0; display:flex; align-items:center; justify-content:center; font-weight:700; border:1px solid #ddd;">${agentName[0]}</div>
             <div style="flex:1;">
               <h4 style="font-size:0.95rem; margin-bottom:2px;">${agentName}</h4>
               <p style="font-size:0.75rem; color:#666;">${agent.bio || 'Available for matching'}</p>
@@ -232,7 +248,7 @@ async function loadRecruiterDashboard() {
 
           pendingAppsEl.innerHTML += `
             <div class="stat-card" style="display:flex; align-items:center; gap:1.25rem; padding:1.25rem;">
-              <div style="width:40px; height:40px; border-radius:50%; background:var(--yellow); color:#000; display:flex; align-items:center; justify-content:center; font-weight:900; border:1px solid #000; flex-shrink:0;">${agentName[0]}</div>
+              <div onclick="openProfileModal('${app.agent._id || app.agent.id}', event)" style="cursor:pointer; width:40px; height:40px; border-radius:50%; background:var(--yellow); color:#000; display:flex; align-items:center; justify-content:center; font-weight:900; border:1px solid #000; flex-shrink:0;">${agentName[0]}</div>
               <div style="flex:1; min-width:0;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 2px;">
                   <h4 style="font-size:0.95rem;">${agentName}</h4>
@@ -262,5 +278,108 @@ window.updateAppStatus = async (appId, status) => {
     location.reload();
   } catch (err) {
     alert(err.message);
+  }
+};
+
+let activeProfileTarget = null;
+
+window.openProfileModal = async (userId, event) => {
+  const modal = document.getElementById('profile-modal');
+  const card = modal ? modal.querySelector('.modal-card') : null;
+  const content = document.getElementById('profile-modal-content');
+  if (!modal || !content || !card) return;
+
+  // Store target for scroll tracking
+  activeProfileTarget = event ? event.target : null;
+
+  try {
+    // 1. Fetch data BEFORE showing the modal to prevent height-jump "glitches"
+    const user = await apiFetch(`/users/${userId}`);
+    const name = user.name && user.name.toLowerCase() !== 'google' ? user.name : user.email.split('@')[0];
+    const skills = user.skills || [];
+
+    // 2. Prepare the content
+    content.innerHTML = `
+      <div style="display:flex; align-items:center; gap:1.25rem; margin-bottom:1.5rem;">
+        <div style="width:60px; height:60px; border-radius:50%; background:var(--yellow); color:#000; display:flex; align-items:center; justify-content:center; font-size:1.5rem; font-weight:900; border:2px solid #000;">${name[0]}</div>
+        <div>
+          <h2 style="font-family:var(--font-heading); text-transform:uppercase; letter-spacing:-0.05em; font-size:1.25rem; margin:0;">${name}</h2>
+          <p style="color:var(--gray); font-size:0.7rem; margin:2px 0 0;">${user.location || 'Remote Agent'}</p>
+        </div>
+      </div>
+
+      <div style="margin-bottom:1.25rem;">
+        <h4 style="font-size:0.65rem; text-transform:uppercase; color:#999; margin-bottom:0.5rem; letter-spacing:0.1em;">Skills & Expertise</h4>
+        <div style="display:flex; flex-wrap:wrap; gap:0.4rem;">
+          ${skills.map(s => `
+            <span class="badge-pill" style="background:#000; color:#fff; font-size:0.6rem; border:1px solid #000;">
+              ${s.toUpperCase()}
+            </span>`).join('') || '<span style="color:#999; font-size:0.7rem;">No skills listed</span>'}
+        </div>
+      </div>
+
+      <div style="margin-bottom:1.5rem;">
+        <p style="font-size:0.85rem; line-height:1.5; color:#333; margin:0;">${user.bio || 'Available for high-impact matching.'}</p>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:0.75rem;">
+        ${user.resumeDoc ? `
+          <a href="${user.resumeDoc}" target="_blank" class="btn btn-primary" style="justify-content:center; width:100%;">View Full CV / Resume</a>
+        ` : `
+          <button class="btn btn-ghost" disabled style="width:100%; opacity:0.5; cursor:not-allowed;">No CV Uploaded</button>
+        `}
+        <a href="chat.html?userId=${userId}" class="btn btn-ghost btn-sm" style="justify-content:center; width:100%;">Send Message</a>
+      </div>
+    `;
+
+    // 3. Now show the modal with full content
+    modal.style.display = 'flex';
+    modal.style.background = 'transparent'; 
+    modal.style.pointerEvents = 'none'; 
+    card.style.pointerEvents = 'auto'; 
+    card.style.position = 'fixed';
+    card.style.margin = '0';
+    card.style.zIndex = '3000';
+
+    const updatePosition = () => {
+      if (!activeProfileTarget || modal.style.display === 'none') return;
+      const rect = activeProfileTarget.getBoundingClientRect();
+      if (rect.top < 0 || rect.bottom > window.innerHeight) {
+        closeProfileModal();
+        return;
+      }
+
+      let top = rect.top - 20;
+      const cardHeight = card.offsetHeight;
+      if (top + cardHeight > window.innerHeight) {
+        top = window.innerHeight - cardHeight - 20;
+      }
+      if (top < 10) top = 10;
+
+      card.style.top = `${top}px`;
+      card.style.left = `${rect.right + 20}px`; 
+    };
+
+    updatePosition();
+    setTimeout(() => modal.classList.add('active'), 10);
+
+    window.addEventListener('scroll', updatePosition, { passive: true });
+    window.addEventListener('resize', updatePosition);
+
+  } catch (err) {
+    console.error('Profile fetch error:', err);
+  }
+};
+
+window.closeProfileModal = () => {
+  const modal = document.getElementById('profile-modal');
+  if (modal) {
+    modal.classList.remove('active');
+    setTimeout(() => {
+      if (!modal.classList.contains('active')) {
+        modal.style.display = 'none';
+        activeProfileTarget = null;
+      }
+    }, 300);
   }
 };

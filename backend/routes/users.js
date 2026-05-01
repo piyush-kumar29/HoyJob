@@ -16,6 +16,20 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
+// @route   GET api/users/:id
+// @desc    Get user by ID
+router.get('/:id', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id)
+      .select('name email role bio organization location experience skills resumeDoc createdAt');
+    if (!user) return res.status(404).json({ msg: 'User not found' });
+    res.json(user);
+  } catch (err) {
+    console.error('Get User Error:', err.message);
+    res.status(500).json({ error: 'Server Error', details: err.message });
+  }
+});
+
 // @route   PUT api/users/profile
 // @desc    Update user profile
 router.put('/profile', auth, async (req, res) => {

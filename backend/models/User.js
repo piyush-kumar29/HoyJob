@@ -20,6 +20,7 @@ const UserSchema = new mongoose.Schema({
   interviewsToday: { type: Number, default: 0 },
   aadhaarDoc: { type: String, default: '' }, // URL or base64
   certificateDoc: { type: String, default: '' }, // URL or base64
+  resumeDoc: { type: String, default: '' }, // URL or base64
   createdAt: { type: Date, default: Date.now }
 });
 

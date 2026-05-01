@@ -27,14 +27,11 @@ router.post('/signup', async (req, res) => {
     user = new User({
       name,
       email,
-      password,
+      password, // The Model's pre-save hook will hash this automatically!
       role,
       verificationToken,
       isVerified: false
     });
-
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
 
     await user.save();
 

@@ -80,3 +80,27 @@
     font-size: 0.8rem;
     color: rgba(0, 0, 0, 0.3);
 }
+
+/* Success State Styles */
+.auth-success-state {
+    text-align: center;
+    padding: 1rem 0;
+}
+.success-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+}
+.auth-success-state h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+.auth-success-state p {
+    color: #4b5563;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+.email-highlight {
+    font-weight: 700;
+    color: #000;
+    text-decoration: underline;
+}

@@ -21,8 +21,14 @@ async function handleSignup(e) {
 
     if (res.requiresVerification) {
       document.getElementById('signup-form').style.display = 'none';
+      document.querySelector('.role-toggle').style.display = 'none';
+      document.querySelector('.subtitle').style.display = 'none';
+      document.querySelector('.auth-card h1').style.display = 'none';
+      
       const successEl = document.getElementById('auth-success');
-      successEl.textContent = res.msg;
+      const msgEl = document.getElementById('success-msg');
+      
+      msgEl.innerHTML = `Verification mail sent to <span class="email-highlight">${email}</span>!<br>Please check your inbox to activate your account.`;
       successEl.style.display = 'block';
     }
   } catch (err) {

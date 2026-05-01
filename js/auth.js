@@ -10,6 +10,12 @@ async function handleSignup(e) {
   const role = document.querySelector('input[name="role"]:checked').value;
 
   const btn = document.getElementById('signup-btn');
+
+  if (password.length < 8) {
+    showError('Password must be at least 8 characters long');
+    return;
+  }
+
   btn.disabled = true;
   btn.textContent = 'Creating account...';
 

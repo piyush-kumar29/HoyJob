@@ -15,6 +15,10 @@ router.post('/signup', async (req, res) => {
   const password = req.body.password.trim();
   const role = req.body.role;
 
+  if (password.length < 8) {
+    return res.status(400).json({ msg: 'Password must be at least 8 characters long' });
+  }
+
   try {
     let user = await User.findOne({ email });
     if (user) {

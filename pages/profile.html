@@ -221,6 +221,22 @@
                 <button id="view-cert" class="btn btn-sm btn-yellow" style="display:none;">View</button>
               </div>
             </div>
+
+            <!-- CV / Resume -->
+            <div class="doc-card" id="doc-cv">
+              <div style="display:flex; align-items:center; gap:1rem;">
+                <span style="font-size:1.5rem;">📄</span>
+                <div>
+                  <div style="font-weight:600; font-size:0.9rem;">Professional CV / Resume</div>
+                  <div id="cv-status" style="font-size:0.75rem; color:#999;">Not uploaded</div>
+                </div>
+              </div>
+              <div style="display:flex; gap:0.5rem; align-items:center;">
+                <input type="file" id="upload-cv" hidden accept=".pdf,.doc,.docx">
+                <button class="btn btn-sm" onclick="document.getElementById('upload-cv').click()" style="background:#f5f5f5; border:1px solid #ddd; color:#000;">Upload CV</button>
+                <button id="view-cv" class="btn btn-sm btn-yellow" style="display:none;">View</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -21,6 +21,8 @@ const UserSchema = new mongoose.Schema({
   aadhaarDoc: { type: String, default: '' }, // URL or base64
   certificateDoc: { type: String, default: '' }, // URL or base64
   resumeDoc: { type: String, default: '' }, // URL or base64
+  verificationToken: { type: String },
+  isVerified: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }
 });
 

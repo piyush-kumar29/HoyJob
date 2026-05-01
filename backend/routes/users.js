@@ -33,7 +33,7 @@ router.get('/:id', auth, async (req, res) => {
 // @route   PUT api/users/profile
 // @desc    Update user profile
 router.put('/profile', auth, async (req, res) => {
-  const { name, bio, organization, location, experience, skills, appsSent, interviewCount, matchingScore, activeRoles, totalCandidates, interviewsToday, aadhaarDoc, certificateDoc } = req.body;
+  const { name, bio, organization, location, experience, skills, appsSent, interviewCount, matchingScore, activeRoles, totalCandidates, interviewsToday, aadhaarDoc, certificateDoc, resumeDoc } = req.body;
   try {
     let user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ msg: 'User not found' });
@@ -52,6 +52,7 @@ router.put('/profile', auth, async (req, res) => {
     if (interviewsToday !== undefined) user.interviewsToday = interviewsToday;
     if (aadhaarDoc) user.aadhaarDoc = aadhaarDoc;
     if (certificateDoc) user.certificateDoc = certificateDoc;
+    if (resumeDoc) user.resumeDoc = resumeDoc;
 
     await user.save();
     res.json(user);

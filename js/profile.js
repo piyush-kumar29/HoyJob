@@ -46,10 +46,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Document Elements
   const uploadAadhaar = document.getElementById('upload-aadhaar');
   const uploadCert = document.getElementById('upload-cert');
+  const uploadCv = document.getElementById('upload-cv');
   const viewAadhaar = document.getElementById('view-aadhaar');
   const viewCert = document.getElementById('view-cert');
+  const viewCv = document.getElementById('view-cv');
   const aadhaarStatus = document.getElementById('aadhaar-status');
   const certStatus = document.getElementById('cert-status');
+  const cvStatus = document.getElementById('cv-status');
 
   let currentFullUser = null;
   let selectedSkills = [];
@@ -120,6 +123,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (currentFullUser.certificateDoc) {
         if (certStatus) { certStatus.textContent = 'Uploaded ✓'; certStatus.style.color = '#22c55e'; }
         if (viewCert) { viewCert.style.display = 'block'; viewCert.onclick = () => viewDocument(currentFullUser.certificateDoc); }
+      }
+      if (currentFullUser.resumeDoc) {
+        if (cvStatus) { cvStatus.textContent = 'Uploaded ✓'; cvStatus.style.color = '#22c55e'; }
+        if (viewCv) { viewCv.style.display = 'block'; viewCv.onclick = () => viewDocument(currentFullUser.resumeDoc); }
       }
 
       if (typeof buildNav === 'function') buildNav();
@@ -204,13 +211,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
   }
 
-  [uploadAadhaar, uploadCert].forEach(input => {
+  [uploadAadhaar, uploadCert, uploadCv].forEach(input => {
     if (!input) return;
     input.onchange = async (e) => {
       const file = e.target.files[0];
       if (!file || file.size > 5 * 1024 * 1024) { alert('File too large or missing'); return; }
       try {
-        const field = input.id === 'upload-aadhaar' ? 'aadhaarDoc' : 'certificateDoc';
+        let field = 'aadhaarDoc';
+        if (input.id === 'upload-cert') field = 'certificateDoc';
+        if (input.id === 'upload-cv') field = 'resumeDoc';
+        
         const base64 = await toBase64(file);
         await apiFetch('/users/profile', { method: 'PUT', body: JSON.stringify({ [field]: base64 }) });
         alert('Uploaded!'); await loadProfile();

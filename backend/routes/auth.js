@@ -125,7 +125,7 @@ router.post('/login', async (req, res) => {
     let user = await User.findOne({ email });
     if (!user) {
       console.log(`Login failed: User not found for ${email}`);
-      return res.status(400).json({ msg: 'Invalid Credentials' });
+      return res.status(400).json({ msg: "Account doesn't exist. Please create one." });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);

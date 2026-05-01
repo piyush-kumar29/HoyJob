@@ -23,7 +23,7 @@ router.get('/me', auth, async (req, res) => {
         name: `${clerkUser.firstName} ${clerkUser.lastName}`,
         email: clerkUser.emailAddresses[0].emailAddress,
         password: 'clerk-managed', // placeholder as Clerk handles password
-        role: clerkUser.publicMetadata.role || 'agent'
+        role: clerkUser.unsafeMetadata.role || 'agent'
       });
       await user.save();
     }

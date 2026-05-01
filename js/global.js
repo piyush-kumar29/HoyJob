@@ -44,7 +44,7 @@ function getUser() {
     id: Clerk.user.id,
     name: `${Clerk.user.firstName} ${Clerk.user.lastName}`,
     email: Clerk.user.emailAddresses[0].emailAddress,
-    role: Clerk.user.publicMetadata.role || 'agent',
+    role: Clerk.user.unsafeMetadata.role || 'agent',
     avatar: Clerk.user.imageUrl
   };
 }
@@ -58,6 +58,14 @@ async function logout() {
     await Clerk.signOut();
     window.location.href = getBasePath() + 'index.html';
   }
+}
+
+function requireAuth() {
+  if (!isLoggedIn()) {
+    window.location.href = getBasePath() + 'pages/login.html';
+    return false;
+  }
+  return true;
 }
 
 // --- API Helpers ---
@@ -143,5 +151,6 @@ function buildNav() {
 
 // --- Init ---
 document.addEventListener('DOMContentLoaded', () => {
-  initClerk();
+  buildNav(); // Show initial nav immediately
+  initClerk(); // Initialize Clerk to update nav if logged in
 });

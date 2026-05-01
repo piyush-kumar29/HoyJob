@@ -1,30 +1,47 @@
-const nodemailer = require('nodemailer');
-const dns = require('dns');
-
-// Force Node.js to resolve DNS to IPv4 first
-// Render's free tier does not support outbound IPv6
-dns.setDefaultResultOrder('ipv4first');
+const https = require('https');
 
 const sendEmail = async (options) => {
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
+  const data = JSON.stringify({
+    sender: {
+      name: 'HoyJob',
+      email: process.env.BREVO_SENDER_EMAIL
     },
-    connectionTimeout: 15000,
-    greetingTimeout: 15000
+    to: [{ email: options.email }],
+    subject: options.subject,
+    textContent: options.message,
+    htmlContent: options.html
   });
 
-  const mailOptions = {
-    from: `HoyJob <${process.env.EMAIL_USER}>`,
-    to: options.email,
-    subject: options.subject,
-    text: options.message,
-    html: options.html
-  };
+  return new Promise((resolve, reject) => {
+    const req = https.request(
+      {
+        hostname: 'api.brevo.com',
+        path: '/v3/smtp/email',
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'api-key': process.env.BREVO_API_KEY,
+          'content-type': 'application/json',
+          'content-length': Buffer.byteLength(data)
+        }
+      },
+      (res) => {
+        let body = '';
+        res.on('data', (chunk) => { body += chunk; });
+        res.on('end', () => {
+          if (res.statusCode >= 200 && res.statusCode < 300) {
+            resolve(JSON.parse(body));
+          } else {
+            reject(new Error(`Brevo API error ${res.statusCode}: ${body}`));
+          }
+        });
+      }
+    );
 
-  await transporter.sendMail(mailOptions);
+    req.on('error', reject);
+    req.write(data);
+    req.end();
+  });
 };
 
 module.exports = sendEmail;

@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     try {
       const allUsers = await apiFetch('/users');
-      allOtherUsers = allUsers.filter(u => (u._id || u.id) !== currentUserId);
+      allOtherUsers = allUsers.filter(u => (u._id || u.id) !== currentUserId && u.isVerified !== false);
       renderContacts(allOtherUsers);
 
       // Deep Linking: Auto-select user from URL parameter

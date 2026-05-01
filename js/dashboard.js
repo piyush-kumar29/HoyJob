@@ -167,7 +167,7 @@ async function loadRecruiterDashboard() {
 
     const jobs = await apiFetch('/jobs');
     const users = await apiFetch('/users');
-    const agents = users.filter(u => u.role === 'agent');
+    const agents = users.filter(u => u.role === 'agent' && u.isVerified !== false);
 
     // Filter my jobs
     const myJobs = jobs.filter(j => {
@@ -226,7 +226,7 @@ async function loadRecruiterDashboard() {
     const pendingAppsEl = document.getElementById('pending-apps');
     if (pendingAppsEl) {
       const apps = await apiFetch('/applications/my');
-      const pending = apps.filter(a => a.status === 'pending');
+      const pending = apps.filter(a => a.status === 'pending' && a.agent && a.agent.isVerified !== false);
       
       if (pending.length === 0) {
         pendingAppsEl.innerHTML = '<p style="color:#999; padding:1rem; font-size:0.9rem;">No pending applications.</p>';

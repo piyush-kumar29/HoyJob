@@ -73,7 +73,7 @@ router.get('/my', auth, async (req, res) => {
 
     const apps = await Application.find(query)
       .populate('job', 'title company')
-      .populate('agent', 'name email experience skills')
+      .populate('agent', 'name email experience skills isVerified')
       .populate('recruiter', 'name email organization')
       .sort({ updatedAt: -1 });
     res.json(apps);

@@ -8,7 +8,7 @@ const auth = require('../middleware/auth');
 router.get('/', auth, async (req, res) => {
   try {
     const users = await User.find({ _id: { $ne: req.user.id } })
-      .select('name email role bio organization location experience skills createdAt');
+      .select('name email role bio organization location experience skills isVerified createdAt');
     res.json(users);
   } catch (err) {
     console.error('Get Users Error:', err.message);

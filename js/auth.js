@@ -1,86 +1,42 @@
-// Auth JS — Login & Signup logic
+// Auth JS — Clerk Integration
 
-async function handleLogin(e) {
-  e.preventDefault();
-  const email = document.getElementById('login-email').value.trim();
-  const password = document.getElementById('login-password').value;
-
-  if (!email || !password) {
-    showError('Please fill in all fields.');
-    return;
-  }
-
-  try {
-    const data = await apiFetch('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, password })
-    });
-
-    setToken(data.token);
-    setUser(data.user);
-
-    if (data.user.role === 'agent') {
-      window.location.href = 'agent-dashboard.html';
-    } else {
-      window.location.href = 'recruiter-dashboard.html';
+async function initAuthPage() {
+  // Wait for Clerk to be ready
+  const checkClerk = setInterval(() => {
+    if (window.Clerk && window.Clerk.isReady()) {
+      clearInterval(checkClerk);
+      renderClerkComponents();
     }
-  } catch (err) {
-    showError(err.message);
-  }
+  }, 100);
 }
 
-async function handleSignup(e) {
-  e.preventDefault();
-  const name = document.getElementById('signup-name').value.trim();
-  const email = document.getElementById('signup-email').value.trim();
-  const password = document.getElementById('signup-password').value;
-  const role = document.querySelector('input[name="role"]:checked')?.value || 'agent';
+function renderClerkComponents() {
+  const signupContainer = document.getElementById('clerk-signup');
+  const loginContainer = document.getElementById('clerk-login');
 
-  if (!name || !email || !password) {
-    showError('Please fill in all fields.');
-    return;
-  }
-
-  try {
-    const data = await apiFetch('/auth/signup', {
-      method: 'POST',
-      body: JSON.stringify({ name, email, password, role })
-    });
-
-    if (data.msg) {
-      showSuccess(data.msg);
-      // Hide error if visible
-      const errorEl = document.getElementById('auth-error');
-      if (errorEl) errorEl.style.display = 'none';
-      return;
-    }
-
-    // Fallback if token is returned (e.g. if verification is disabled)
-    if (data.token) {
-      setToken(data.token);
-      setUser(data.user);
-      if (data.user.role === 'agent') {
-        window.location.href = 'agent-dashboard.html';
-      } else {
-        window.location.href = 'recruiter-dashboard.html';
+  if (signupContainer) {
+    window.Clerk.mountSignUp(signupContainer, {
+      appearance: {
+        variables: {
+          colorPrimary: '#EFFF00',
+          colorBackground: '#ffffff',
+          colorText: '#000000'
+        }
       }
-    }
-  } catch (err) {
-    showError(err.message);
+    });
+  }
+
+  if (loginContainer) {
+    window.Clerk.mountSignIn(loginContainer, {
+      appearance: {
+        variables: {
+          colorPrimary: '#EFFF00',
+          colorBackground: '#ffffff',
+          colorText: '#000000'
+        }
+      }
+    });
   }
 }
 
-function showSuccess(msg) {
-  const el = document.getElementById('auth-success');
-  if (el) { 
-    el.textContent = msg; 
-    el.style.display = 'block'; 
-  } else {
-    alert(msg); // Fallback
-  }
-}
-
-function showError(msg) {
-  const el = document.getElementById('auth-error');
-  if (el) { el.textContent = msg; el.style.display = 'block'; }
-}
+document.addEventListener('DOMContentLoaded', initAuthPage);

@@ -1,81 +1,69 @@
-// Auth JS — Custom UI with Clerk SDK Logic
+/* ============================================
+   AUTH JS — Signup & Login Logic
+   ============================================ */
 
 async function handleSignup(e) {
   e.preventDefault();
-  if (!window.Clerk || !window.Clerk.isReady()) return;
-
-  const name = document.getElementById('signup-name').value.trim();
-  const email = document.getElementById('signup-email').value.trim();
+  const name = document.getElementById('signup-name').value;
+  const email = document.getElementById('signup-email').value;
   const password = document.getElementById('signup-password').value;
-  const role = document.querySelector('input[name="role"]:checked')?.value || 'agent';
+  const role = document.querySelector('input[name="role"]:checked').value;
 
-  const nameParts = name.split(' ');
-  const firstName = nameParts[0];
-  const lastName = nameParts.slice(1).join(' ') || ' ';
+  const btn = document.getElementById('signup-btn');
+  btn.disabled = true;
+  btn.textContent = 'Creating account...';
 
   try {
-    // 1. Create the sign up attempt
-    const signUp = await window.Clerk.client.signUp.create({
-      emailAddress: email,
-      password: password,
-      firstName: firstName,
-      lastName: lastName,
-      unsafeMetadata: { role: role } // Store role in Clerk (accessible by client)
+    const res = await apiFetch('/auth/signup', {
+      method: 'POST',
+      body: JSON.stringify({ name, email, password, role })
     });
 
-    // 2. Prepare email link verification
-    await signUp.prepareEmailAddressVerification({
-      strategy: 'email_link',
-      redirectUrl: window.location.origin + '/pages/login.html'
-    });
-
-    // 3. UI Update: Show check email message
-    document.getElementById('signup-form').style.display = 'none';
-    document.getElementById('clerk-signup-msg').style.display = 'block';
-    showSuccess('Verification link sent! Please check your inbox.');
-
+    if (res.requiresVerification) {
+      document.getElementById('signup-form').style.display = 'none';
+      const successEl = document.getElementById('auth-success');
+      successEl.textContent = res.msg;
+      successEl.style.display = 'block';
+    }
   } catch (err) {
-    console.error('Clerk Signup Error:', err);
-    showError(err.errors ? err.errors[0].longMessage : err.message);
+    showError(err.message);
+    btn.disabled = false;
+    btn.textContent = 'Create Account';
   }
 }
 
 async function handleLogin(e) {
   e.preventDefault();
-  if (!window.Clerk || !window.Clerk.isReady()) return;
-
-  const email = document.getElementById('login-email').value.trim();
+  const email = document.getElementById('login-email').value;
   const password = document.getElementById('login-password').value;
 
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true;
+  btn.textContent = 'Logging in...';
+
   try {
-    const signIn = await window.Clerk.client.signIn.create({
-      identifier: email,
-      password: password,
+    const res = await apiFetch('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password })
     });
 
-    if (signIn.status === 'complete') {
-      await window.Clerk.setActive({ session: signIn.createdSessionId });
-      
-      // Get user to determine redirect
-      const user = await apiFetch('/auth/me'); // Sync with our DB
-      const dashboardLink = user.role === 'recruiter' ? 'recruiter-dashboard.html' : 'agent-dashboard.html';
-      window.location.href = dashboardLink;
-    } else {
-      // Could be 'needs_identifier' or other states
-      showError('Login incomplete. Please ensure your email is verified.');
-    }
+    setToken(res.token);
+    setUser(res.user);
+
+    const dashboard = res.user.role === 'recruiter' ? 'recruiter-dashboard.html' : 'agent-dashboard.html';
+    window.location.href = dashboard;
   } catch (err) {
-    console.error('Clerk Login Error:', err);
-    showError(err.errors ? err.errors[0].longMessage : err.message);
+    showError(err.message);
+    btn.disabled = false;
+    btn.textContent = 'Log In';
   }
 }
 
 function showError(msg) {
-  const el = document.getElementById('auth-error');
-  if (el) { el.textContent = msg; el.style.display = 'block'; }
-}
-
-function showSuccess(msg) {
-  const el = document.getElementById('auth-success');
-  if (el) { el.textContent = msg; el.style.display = 'block'; }
+  const errEl = document.getElementById('auth-error');
+  errEl.textContent = msg;
+  errEl.style.display = 'block';
+  setTimeout(() => {
+    errEl.style.display = 'none';
+  }, 5000);
 }

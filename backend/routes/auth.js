@@ -9,6 +9,7 @@ const auth = require('../middleware/auth');
 
 // @route   POST api/auth/signup
 // @desc    Register user & send verification email
+router.post('/signup', async (req, res) => {
   const name = req.body.name.trim();
   const email = req.body.email.trim().toLowerCase();
   const password = req.body.password.trim();
@@ -118,6 +119,7 @@ router.get('/verify/:token', async (req, res) => {
 // @route   POST api/auth/login
 // @desc    Authenticate user & get token
 router.post('/login', async (req, res) => {
+  try {
     const email = req.body.email.trim().toLowerCase();
     const password = req.body.password.trim();
 

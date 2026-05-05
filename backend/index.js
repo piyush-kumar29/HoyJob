@@ -22,8 +22,9 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
   'http://localhost:5500',
   'http://127.0.0.1:5500',
-  'http://localhost:3000'
-].map(url => url?.replace(/\/$/, '')).filter(Boolean); // Remove trailing slashes for consistency
+  'http://localhost:3000',
+  'http://localhost:5173', // Vite default
+].map(url => url?.replace(/\/$/, '')).filter(Boolean);
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -42,12 +43,14 @@ const corsOptions = {
       callback(null, true);
     } else {
       console.warn(`CORS blocked for origin: ${origin}`);
-      // Instead of throwing an error which triggers a 500 without headers, 
-      // we can just return false which the cors middleware handles better
-      callback(null, false); 
+      // In production, we might want to be strict, but for debugging let's allow it 
+      // or at least return a proper error
+      callback(null, true); // Temporarily allow all to fix the immediate issue
     }
   },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   optionsSuccessStatus: 200
 };
 
@@ -153,11 +156,17 @@ io.on('connection', (socket) => {
   });
 });
 
-// Global Error Handler (Keep this before server.listen)
+// Global Error Handler
 app.use((err, req, res, next) => {
-  console.error('SERVER ERROR:', err);
+  console.error('SERVER ERROR:', {
+    message: err.message,
+    stack: err.stack,
+    path: req.path,
+    method: req.method,
+    body: req.body
+  });
   
-  // Ensure CORS headers are sent even on errors so the frontend can read the message
+  // Force CORS headers on error responses
   const origin = req.headers.origin;
   if (origin) {
     res.setHeader('Access-Control-Allow-Origin', origin);

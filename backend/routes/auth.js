@@ -187,12 +187,20 @@ router.post('/login', async (req, res) => {
       }
     };
 
+    if (!process.env.JWT_SECRET) {
+      console.error('CRITICAL ERROR: JWT_SECRET is not defined in environment variables.');
+      return res.status(500).json({ msg: 'Server configuration error' });
+    }
+
     jwt.sign(
       payload,
       process.env.JWT_SECRET,
-      { expiresIn: 360000 },
+      { expiresIn: '7d' }, // Longer expiry for better UX
       (err, token) => {
-        if (err) throw err;
+        if (err) {
+          console.error('JWT Signing Error:', err);
+          return res.status(500).json({ msg: 'Error generating token' });
+        }
         res.json({ 
           token,
           user: {

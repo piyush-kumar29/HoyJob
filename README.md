@@ -74,11 +74,10 @@ HoyJob/
 
 ### 🔐 Dual-Portal System
 
-| Portal | Role | Access |
+| Portal | Role |
 |---|---|---|
-| 👔 **Recruiter Portal** | Post jobs, review candidates, manage pipelines | `recruiter@gmail.com` |
-| 🧑‍💼 **Agent Portal** | Build profiles, apply to roles, track applications | Register on signup |
-| 🛡️ **Admin Dashboard** | Platform oversight, user management, analytics | `admin@gmail.com` |
+| 👔 **Recruiter Portal** | Post jobs, review candidates, manage pipelines |
+| 🧑‍💼 **Agent Portal** | Build profiles, apply to roles, track applications | 
 
 ### 🛍️ Talent Marketplace
 > A curated open marketplace where verified agents showcase their skills, past projects, and availability — and recruiters browse talent on demand, without posting a single job listing.
@@ -118,7 +117,7 @@ HoyJob/
 |---|---|
 | **Frontend** | HTML5, CSS3, Vanilla JavaScript |
 | **Backend** | Node.js |
-| **Auth** | JWT / Session-based |
+| **Auth** | JWT / Session-based / bCrypt.js / Brevo API |
 | **Deployment** | Render (backend) · Vercel (frontend) |
 | **Data** | JSON / REST API |
 
@@ -160,27 +159,7 @@ Contributions are welcome! Here's how to get involved:
 
 ---
 
-## 📬 Contact
-
-<div align="center">
-
-📍 500 Connaught Place, New Delhi 110001
-📧 [info@hoyjob.com](mailto:info@hoyjob.com)
-📞 +91 11-23456789
-
-[![Twitter](https://img.shields.io/badge/𝕏-Follow-000000?style=flat-square&logo=x)](https://x.com)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0077B5?style=flat-square&logo=linkedin)](https://linkedin.com)
-
-</div>
-
----
-
-<div align="center">
-
-**[🌐 Live Site](https://hoyjob.onrender.com) · [📋 Terms](https://hoyjob.onrender.com/pages/terms.html) · [🔒 Privacy](https://hoyjob.onrender.com/pages/privacy.html) · [♿ Accessibility](https://hoyjob.onrender.com/pages/accessibility.html)**
-
-<br/>
-
+<br>
 *© 2026 HoyJob Inc. — Built to hire smarter, not harder.*
 
 </div>

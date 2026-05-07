@@ -159,7 +159,4 @@ Contributions are welcome! Here's how to get involved:
 
 ---
 
-<br>
-*© 2026 HoyJob Inc. — Built to hire smarter, not harder.*
-
 </div>
